@@ -14,7 +14,7 @@
 - [ ] Test Code
 - [ ] Others (describe below)
 
-## 📸 Screenshots (if applicable)
+## 📸 Screenshots
 
 <!-- Add screenshots if the PR includes UI work -->
 
