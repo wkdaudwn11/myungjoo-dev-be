@@ -14,10 +14,6 @@
 - [ ] Test Code
 - [ ] Others (describe below)
 
-## 📸 Screenshots
-
-<!-- Add screenshots if the PR includes UI work -->
-
 ## 🔗 Related Issues
 
 <!-- Add related issue numbers if applicable -->
