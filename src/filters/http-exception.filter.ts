@@ -5,6 +5,7 @@ import {
   HttpException,
   HttpStatus,
 } from '@nestjs/common';
+import { ValidationError } from 'class-validator';
 import { Request, Response } from 'express';
 
 interface FieldError {
@@ -24,6 +25,19 @@ interface FailureResponse {
   success: false;
   statusCode: number;
   data: ErrorBody;
+}
+
+function parseFieldErrors(errors: ValidationError[]): FieldError[] {
+  return errors.flatMap((error) => {
+    const messages = error.constraints
+      ? Object.values(error.constraints)
+      : ['invalid value'];
+
+    return messages.map((msg) => ({
+      field: error.property,
+      message: msg,
+    }));
+  });
 }
 
 @Catch()
@@ -51,7 +65,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         exceptionResponse !== null
       ) {
         const responseObj = exceptionResponse as {
-          message?: string | string[];
+          message?: string | ValidationError[];
           errorCode?: string;
           meta?: Record<string, unknown>;
         };
@@ -65,16 +79,15 @@ export class HttpExceptionFilter implements ExceptionFilter {
         code = responseObj.errorCode;
         meta = responseObj.meta;
 
-        if (Array.isArray(responseObj.message)) {
-          message = responseObj.message.join(', ');
-
-          fieldErrors = responseObj.message.map((msg: string) => {
-            const [field, ...rest] = msg.split(' ');
-            return {
-              field,
-              message: rest.join(' '),
-            };
-          });
+        if (
+          Array.isArray(responseObj.message) &&
+          responseObj.message.length > 0 &&
+          responseObj.message[0].constraints
+        ) {
+          fieldErrors = parseFieldErrors(responseObj.message);
+          message = fieldErrors.map((e) => `${e.message}`).join(', ');
+        } else if (typeof responseObj.message === 'string') {
+          message = responseObj.message;
         }
       }
     }
