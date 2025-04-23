@@ -7,12 +7,17 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
+interface FieldError {
+  field: string;
+  message: string;
+}
 interface ErrorBody {
   message: string;
   path: string;
   timestamp: string;
   code?: string;
   meta?: Record<string, unknown>;
+  fieldErrors?: FieldError[];
 }
 
 interface FailureResponse {
@@ -32,6 +37,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     let message = '서버 내부 오류가 발생했습니다.';
     let code: string | undefined;
     let meta: Record<string, unknown> | undefined;
+    let fieldErrors: FieldError[] | undefined;
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
@@ -58,6 +64,18 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
         code = responseObj.errorCode;
         meta = responseObj.meta;
+
+        if (Array.isArray(responseObj.message)) {
+          message = responseObj.message.join(', ');
+
+          fieldErrors = responseObj.message.map((msg: string) => {
+            const [field, ...rest] = msg.split(' ');
+            return {
+              field,
+              message: rest.join(' '),
+            };
+          });
+        }
       }
     }
 
@@ -67,6 +85,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
       ...(code ? { code } : {}),
       ...(meta ? { meta } : {}),
+      ...(fieldErrors ? { fieldErrors } : {}),
     };
 
     const errorResponse: FailureResponse = {
