@@ -36,14 +36,17 @@ export class HttpExceptionFilter implements ExceptionFilter {
     if (exception instanceof HttpException) {
       status = exception.getStatus();
 
-      const res = exception.getResponse();
+      const exceptionResponse = exception.getResponse();
 
-      if (typeof res === 'string') {
-        message = res;
-      } else if (typeof res === 'object' && res !== null) {
-        const responseObj = res as {
+      if (typeof exceptionResponse === 'string') {
+        message = exceptionResponse;
+      } else if (
+        typeof exceptionResponse === 'object' &&
+        exceptionResponse !== null
+      ) {
+        const responseObj = exceptionResponse as {
           message?: string | string[];
-          code?: string;
+          errorCode?: string;
           meta?: Record<string, unknown>;
         };
 
@@ -53,7 +56,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
           message = responseObj.message;
         }
 
-        code = responseObj.code;
+        code = responseObj.errorCode;
         meta = responseObj.meta;
       }
     }
