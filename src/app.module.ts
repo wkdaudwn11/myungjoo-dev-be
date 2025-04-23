@@ -3,7 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { HealthModule } from './modules/health/health.module';
+
+import { HealthModule } from '@/modules/health/health.module';
 
 @Module({
   imports: [
