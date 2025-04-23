@@ -12,13 +12,13 @@ interface FieldError {
   field: string;
   message: string;
 }
+
 interface ErrorBody {
   message: string;
   path: string;
   timestamp: string;
   code?: string;
   meta?: Record<string, unknown>;
-  fieldErrors?: FieldError[];
 }
 
 interface FailureResponse {
@@ -50,12 +50,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = '서버 내부 오류가 발생했습니다.';
     let code: string | undefined;
-    let meta: Record<string, unknown> | undefined;
-    let fieldErrors: FieldError[] | undefined;
+    let meta: Record<string, unknown> = {};
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
-
       const exceptionResponse = exception.getResponse();
 
       if (typeof exceptionResponse === 'string') {
@@ -70,24 +68,27 @@ export class HttpExceptionFilter implements ExceptionFilter {
           meta?: Record<string, unknown>;
         };
 
-        if (Array.isArray(responseObj.message)) {
-          message = responseObj.message.join(', ');
-        } else if (typeof responseObj.message === 'string') {
-          message = responseObj.message;
-        }
-
-        code = responseObj.errorCode;
-        meta = responseObj.meta;
-
         if (
           Array.isArray(responseObj.message) &&
           responseObj.message.length > 0 &&
-          responseObj.message[0].constraints
+          'constraints' in responseObj.message[0]
         ) {
-          fieldErrors = parseFieldErrors(responseObj.message);
-          message = fieldErrors.map((e) => `${e.message}`).join(', ');
-        } else if (typeof responseObj.message === 'string') {
-          message = responseObj.message;
+          const fieldErrors = parseFieldErrors(responseObj.message);
+
+          meta.fieldErrors = fieldErrors;
+          message = fieldErrors.map((e) => e.message).join(', ');
+          code = 'VALIDATION_ERROR';
+        } else {
+          if (typeof responseObj.message === 'string') {
+            message = responseObj.message;
+          } else if (Array.isArray(responseObj.message)) {
+            message = responseObj.message.join(', ');
+          }
+
+          code = responseObj.errorCode;
+          if (responseObj.meta) {
+            meta = { ...meta, ...responseObj.meta };
+          }
         }
       }
     }
@@ -97,8 +98,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       path: request.url,
       timestamp: new Date().toISOString(),
       ...(code ? { code } : {}),
-      ...(meta ? { meta } : {}),
-      ...(fieldErrors ? { fieldErrors } : {}),
+      ...(Object.keys(meta).length > 0 ? { meta } : {}),
     };
 
     const errorResponse: FailureResponse = {
