@@ -20,7 +20,7 @@ export class UserService {
     });
 
     if (existing) {
-      throw new CustomException('email is already used', 'DUPLICATE_EMAIL', {
+      throw new CustomException('email is already used', 'DUPLICATE_ERROR', {
         fieldErrors: [
           {
             field: 'email',

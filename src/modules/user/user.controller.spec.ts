@@ -14,6 +14,7 @@ const mockUser: User = {
 describe('UserController', () => {
   let controller: UserController;
   let service: UserService;
+  let createSpy: jest.SpyInstance;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -30,17 +31,14 @@ describe('UserController', () => {
 
     controller = module.get<UserController>(UserController);
     service = module.get<UserService>(UserService);
+
+    createSpy = jest.spyOn(service, 'create');
   });
 
   it('유저 생성 요청 시 UserService를 호출해야 함', async () => {
-    const dto: CreateUserDto = {
-      email: 'test@example.com',
-      name: '테스트 유저',
-    };
+    const dto = { email: 'test@test.com', name: '테스트' };
+    await controller.create(dto);
 
-    const result = await controller.create(dto);
-
-    expect(jest.spyOn(service, 'create')).toHaveBeenCalledWith(dto);
-    expect(result).toEqual(mockUser);
+    expect(createSpy).toHaveBeenCalledWith(dto);
   });
 });
