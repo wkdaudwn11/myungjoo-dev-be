@@ -22,7 +22,7 @@ export class HelloService {
 
     if (found) {
       throw new CustomException(
-        `Data for language '${dto.lang}' already exists.`,
+        `'${dto.lang}' lang already exists.`,
         ErrorCode.DUPLICATE_ERROR,
       );
     }

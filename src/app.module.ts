@@ -6,6 +6,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 import { DbModule } from '@/db/db.module';
+import { AboutCategoryModule } from '@/modules/about/category/about-category.module';
 import { HealthModule } from '@/modules/health/health.module';
 import { HelloModule } from '@/modules/hello/hello.module';
 import { UserModule } from '@/modules/user/user.module';
@@ -36,6 +37,7 @@ import { UserModule } from '@/modules/user/user.module';
       ],
     }),
     DbModule,
+    AboutCategoryModule,
     HealthModule,
     HelloModule,
     UserModule,
