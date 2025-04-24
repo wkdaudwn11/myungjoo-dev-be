@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
 
+import { ErrorCode } from '@/common/constants/error-code.enum';
 import { CustomException } from '@/common/exceptions/custom.exception';
 
 @Injectable()
@@ -20,14 +21,18 @@ export class UserService {
     });
 
     if (existing) {
-      throw new CustomException('email is already used', 'DUPLICATE_ERROR', {
-        fieldErrors: [
-          {
-            field: 'email',
-            message: 'email is already used',
-          },
-        ],
-      });
+      throw new CustomException(
+        'email is already used',
+        ErrorCode.DUPLICATE_ERROR,
+        {
+          fieldErrors: [
+            {
+              field: 'email',
+              message: 'email is already used',
+            },
+          ],
+        },
+      );
     }
 
     const user = this.userRepo.create(dto);
