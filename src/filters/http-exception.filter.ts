@@ -8,10 +8,8 @@ import {
 import { ValidationError } from 'class-validator';
 import { Request, Response } from 'express';
 
-interface FieldError {
-  field: string;
-  message: string;
-}
+import { ErrorCode } from '@/common/constants/error-code.enum';
+import { parseFieldErrors } from '@/common/utils/validation.util';
 
 interface ErrorBody {
   message: string;
@@ -25,19 +23,6 @@ interface FailureResponse {
   success: false;
   statusCode: number;
   data: ErrorBody;
-}
-
-function parseFieldErrors(errors: ValidationError[]): FieldError[] {
-  return errors.flatMap((error) => {
-    const messages = error.constraints
-      ? Object.values(error.constraints)
-      : ['invalid value'];
-
-    return messages.map((msg) => ({
-      field: error.property,
-      message: msg,
-    }));
-  });
 }
 
 @Catch()
@@ -77,7 +62,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
           meta.fieldErrors = fieldErrors;
           message = fieldErrors.map((e) => e.message).join(', ');
-          code = 'VALIDATION_ERROR';
+          code = ErrorCode.VALIDATION_ERROR;
         } else {
           if (typeof responseObj.message === 'string') {
             message = responseObj.message;
