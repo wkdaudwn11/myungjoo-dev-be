@@ -11,7 +11,7 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Throttle({ medium: { limit: 20, ttl: 60000 } })
+  @Throttle({ medium: { limit: 20, ttl: 10000 } })
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
