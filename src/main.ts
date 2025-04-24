@@ -23,8 +23,10 @@ async function bootstrap() {
     }),
   );
 
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup('swagger', app, document);
+  if (process.env.NODE_ENV === 'development') {
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('swagger', app, document);
+  }
 
   const port = process.env.PORT || 4000;
   await app.listen(port);
