@@ -11,8 +11,8 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Throttle({ medium: { limit: 20, ttl: 10000 } })
   @Post()
+  @Throttle({ medium: { limit: 20, ttl: 10000 } })
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: '유저 등록',
