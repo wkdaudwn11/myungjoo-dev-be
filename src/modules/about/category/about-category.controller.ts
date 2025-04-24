@@ -9,7 +9,13 @@ import {
   Put,
   Param,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 
 import { AboutCategoryService } from './about-category.service';
@@ -53,7 +59,7 @@ export class AboutCategoryController {
     summary: 'About 카테고리 목록 조회',
     description: '등록된 About 카테고리 목록을 언어(lang) 기준으로 조회합니다.',
   })
-  @ApiParam({
+  @ApiQuery({
     name: 'lang',
     description: 'ko 또는 en',
     example: 'ko',

@@ -58,7 +58,7 @@ export class AboutCategoryService {
     return {
       ...saved,
       key: saved.key as MenuKey,
-      name: JSON.stringify(saved.name),
+      name: saved.name.ko,
     };
   }
 
@@ -138,7 +138,7 @@ export class AboutCategoryService {
       ...saved,
       type: found.type,
       key: found.key as MenuKey,
-      name: JSON.stringify(saved.name),
+      name: saved.name.ko,
     };
   }
 }
