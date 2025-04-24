@@ -10,8 +10,6 @@ import { ErrorCode } from '@/common/constants/error-code.enum';
 import { LangType } from '@/common/constants/lang-type.enum';
 import { CustomException } from '@/common/exceptions/custom.exception';
 
-const SUPPORTED_LANGUAGES = Object.values(LangType);
-
 @Injectable()
 export class HelloService {
   constructor(
@@ -20,22 +18,6 @@ export class HelloService {
   ) {}
 
   async create(dto: CreateHelloDto): Promise<HelloResponseDto> {
-    if (!SUPPORTED_LANGUAGES.includes(dto.lang)) {
-      throw new CustomException(
-        `'${dto.lang}' is not a supported language.`,
-        ErrorCode.NOTFOUND_ERROR,
-        {
-          fieldErrors: [
-            {
-              param: 'lang',
-              message: 'Supported languages are: ko, en',
-            },
-          ],
-        },
-        400,
-      );
-    }
-
     const found = await this.helloRepository.findOneBy({ lang: dto.lang });
 
     if (found) {
@@ -50,22 +32,6 @@ export class HelloService {
   }
 
   async findByLang(lang: LangType): Promise<HelloResponseDto> {
-    if (!SUPPORTED_LANGUAGES.includes(lang)) {
-      throw new CustomException(
-        `'${lang}' is not a supported language.`,
-        ErrorCode.NOTFOUND_ERROR,
-        {
-          fieldErrors: [
-            {
-              param: 'lang',
-              message: 'Supported languages are: ko, en',
-            },
-          ],
-        },
-        400,
-      );
-    }
-
     const found = await this.helloRepository.findOneBy({ lang });
 
     if (!found) {
@@ -91,22 +57,6 @@ export class HelloService {
     lang: LangType,
     dto: CreateHelloDto,
   ): Promise<HelloResponseDto> {
-    if (!SUPPORTED_LANGUAGES.includes(lang)) {
-      throw new CustomException(
-        `'${lang}' is not a supported language.`,
-        ErrorCode.NOTFOUND_ERROR,
-        {
-          fieldErrors: [
-            {
-              param: 'lang',
-              message: 'Supported languages are: ko, en',
-            },
-          ],
-        },
-        400,
-      );
-    }
-
     if (dto.lang !== lang) {
       throw new CustomException(
         `Language in the body ('${dto.lang}') does not match path param ('${lang}').`,
