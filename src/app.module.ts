@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 
 import { DbModule } from '@/db/db.module';
 import { HealthModule } from '@/modules/health/health.module';
+import { HelloModule } from '@/modules/hello/hello.module';
 import { UserModule } from '@/modules/user/user.module';
 
 @Module({
@@ -36,6 +37,7 @@ import { UserModule } from '@/modules/user/user.module';
     }),
     DbModule,
     HealthModule,
+    HelloModule,
     UserModule,
   ],
   controllers: [AppController],
