@@ -21,10 +21,10 @@ export const parseFieldErrors = (errors: ValidationError[]): FieldError[] =>
     }));
   });
 
-export const validateLang = (lang: string) => {
+export const validateLang = (lang: LangType) => {
   const allowedValues = Object.values(LangType).join(', ');
 
-  if (!Object.values(LangType).includes(lang as LangType)) {
+  if (!Object.values(LangType).includes(lang)) {
     throw new CustomException(
       `lang must be one of the following values: ${allowedValues}`,
       ErrorCode.VALIDATION_ERROR,
