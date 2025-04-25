@@ -12,15 +12,6 @@ export class CreateAboutDto {
   @IsNotEmpty()
   menuKey: string;
 
-  //   @ApiProperty({
-  //     description: 'Menu key 값',
-  //     enum: MenuKey,
-  //     example: MenuKey.EXPERIENCE,
-  //     enumName: 'MenuKey',
-  //   })
-  //   @IsEnum(MenuKey)
-  //   menuKey: MenuKey;
-
   @ApiProperty({ example: '한국어 내용', description: '한국어 내용' })
   @IsString()
   @IsNotEmpty()
