@@ -64,8 +64,8 @@ export class AboutController {
   @ApiResponse({ status: 404, description: '데이터를 찾을 수 없음' })
   @ApiResponse({ status: 500, description: '서버 내부 오류' })
   findByKeys(
-    @Query('tab_key') tabKey: string,
-    @Query('menu_key') menuKey: string,
+    @Query('tabKey') tabKey: string,
+    @Query('menuKey') menuKey: string,
     @Query('lang') lang: LangType,
   ): Promise<AboutResponseDto> {
     return this.aboutService.findByKeys(tabKey, menuKey, lang);
