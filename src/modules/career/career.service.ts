@@ -6,10 +6,12 @@ import {
   CreateCareerDto,
   CreateCareerProjectDto,
 } from './dto/create-career.dto';
+import { UpdateCareerDto } from './dto/update-career.dto';
 import { CareerProject } from './entities/career-project.entity';
 import { Career } from './entities/career.entity';
 
 import { ErrorCode } from '@/common/constants/error-code.enum';
+import { LangType } from '@/common/constants/lang-type.enum';
 import { CustomException } from '@/common/exceptions/custom.exception';
 
 @Injectable()
@@ -52,6 +54,60 @@ export class CareerService {
         savedCareer.projects = [];
       }
       return savedCareer;
+    });
+  }
+
+  async findOneByLang(lang: LangType): Promise<Career> {
+    const found = await this.careerRepository.findOne({
+      where: { lang },
+      relations: ['projects'],
+    });
+    if (!found) {
+      throw new CustomException(
+        `lang '${lang}' does not exist.`,
+        ErrorCode.NOTFOUND_ERROR,
+        { lang },
+      );
+    }
+    return found;
+  }
+
+  async updateByKeyAndLang(
+    key: string,
+    lang: LangType,
+    dto: UpdateCareerDto,
+  ): Promise<Career> {
+    const found = await this.careerRepository.findOne({
+      where: { key, lang },
+      relations: ['projects'],
+    });
+    if (!found) {
+      throw new CustomException(
+        `Career with key '${key}' and lang '${lang}' does not exist.`,
+        ErrorCode.NOTFOUND_ERROR,
+        { key, lang },
+      );
+    }
+    return await this.dataSource.transaction(async (manager) => {
+      const { projects, ...careerData } = dto;
+      manager.merge(Career, found, careerData);
+
+      const updatedCareer = await manager.save(Career, found);
+
+      if (projects) {
+        await manager.delete(CareerProject, { careerId: found.id });
+        const projectEntities = projects.map(
+          (project: CreateCareerProjectDto) =>
+            manager.create(CareerProject, {
+              ...project,
+              career: updatedCareer,
+              careerId: updatedCareer.id,
+            }),
+        );
+        await manager.save(CareerProject, projectEntities);
+        updatedCareer.projects = projectEntities;
+      }
+      return updatedCareer;
     });
   }
 }
