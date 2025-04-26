@@ -11,6 +11,7 @@ import { AboutCategoryType, MenuKey } from '@/common/constants/about.enum';
 import { ErrorCode } from '@/common/constants/error-code.enum';
 import { LangType } from '@/common/constants/lang-type.enum';
 import { CustomException } from '@/common/exceptions/custom.exception';
+import { getNextOrder } from '@/common/utils/order.util';
 
 @Injectable()
 export class AboutCategoryService {
@@ -52,15 +53,9 @@ export class AboutCategoryService {
       );
     }
 
-    let displayOrder = dto.displayOrder;
-
-    if (displayOrder === undefined) {
-      const maxOrder = await this.aboutCategoryRepository
-        .createQueryBuilder('category')
-        .select('MAX(category.displayOrder)', 'max')
-        .getRawOne<{ max: number }>();
-      displayOrder = (maxOrder?.max ?? 0) + 1;
-    }
+    const displayOrder = dto.displayOrder
+      ? dto.displayOrder
+      : await getNextOrder(this.aboutCategoryRepository, 'displayOrder');
 
     const created = this.aboutCategoryRepository.create({
       ...dto,

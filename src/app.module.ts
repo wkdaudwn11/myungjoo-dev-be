@@ -11,6 +11,7 @@ import { AboutCategoryModule } from '@/modules/about/category/about-category.mod
 import { CareerModule } from '@/modules/career/career.module';
 import { HealthModule } from '@/modules/health/health.module';
 import { HelloModule } from '@/modules/hello/hello.module';
+import { ProjectModule } from '@/modules/project/project.module';
 import { UserModule } from '@/modules/user/user.module';
 
 @Module({
@@ -44,6 +45,7 @@ import { UserModule } from '@/modules/user/user.module';
     CareerModule,
     HealthModule,
     HelloModule,
+    ProjectModule,
     UserModule,
   ],
   controllers: [AppController],
