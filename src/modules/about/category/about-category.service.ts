@@ -19,6 +19,20 @@ export class AboutCategoryService {
     private readonly aboutCategoryRepository: Repository<AboutCategory>,
   ) {}
 
+  private toResponseDto(
+    entity: AboutCategory,
+    lang?: LangType,
+  ): AboutCategoryResponseDto {
+    return {
+      id: entity.id,
+      type: entity.type,
+      key: entity.key as MenuKey,
+      name: lang ? entity.name[lang] : entity.name.ko,
+      menus: entity.menus,
+      displayOrder: entity.displayOrder,
+    };
+  }
+
   async create(dto: CreateAboutCategoryDto): Promise<AboutCategoryResponseDto> {
     const found = await this.aboutCategoryRepository.findOneBy({
       key: dto.key,
@@ -55,11 +69,7 @@ export class AboutCategoryService {
 
     const saved = await this.aboutCategoryRepository.save(created);
 
-    return {
-      ...saved,
-      key: saved.key as MenuKey,
-      name: saved.name.ko,
-    };
+    return this.toResponseDto(saved);
   }
 
   async findAllByLang(lang: LangType): Promise<AboutCategoryResponseDto[]> {
@@ -83,14 +93,7 @@ export class AboutCategoryService {
       order: { displayOrder: 'ASC' },
     });
 
-    return all.map((item) => ({
-      id: item.id,
-      type: item.type,
-      key: item.key as MenuKey,
-      name: item.name[lang],
-      menus: item.menus,
-      displayOrder: item.displayOrder,
-    }));
+    return all.map((item) => this.toResponseDto(item, lang));
   }
 
   async updateByKey(
@@ -101,7 +104,7 @@ export class AboutCategoryService {
 
     if (!found) {
       throw new CustomException(
-        `Category with key '${key}' does not exist.`,
+        `'${key}' does not exist.`,
         ErrorCode.NOTFOUND_ERROR,
         {
           fieldErrors: [
@@ -134,11 +137,6 @@ export class AboutCategoryService {
     const updated = this.aboutCategoryRepository.merge(found, dto);
     const saved = await this.aboutCategoryRepository.save(updated);
 
-    return {
-      ...saved,
-      type: found.type,
-      key: found.key as MenuKey,
-      name: saved.name.ko,
-    };
+    return this.toResponseDto(saved);
   }
 }

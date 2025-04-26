@@ -19,6 +19,18 @@ export class AboutService {
     private readonly aboutRepository: Repository<About>,
   ) {}
 
+  private toResponseDto(entity: About, lang?: LangType): AboutResponseDto {
+    return {
+      id: entity.id,
+      tabKey: entity.tabKey,
+      menuKey: entity.menuKey,
+      content:
+        lang === LangType.English ? entity.content_en : entity.content_ko,
+      content_ko: entity.content_ko,
+      content_en: entity.content_en,
+    };
+  }
+
   async create(dto: CreateAboutDto): Promise<AboutResponseDto> {
     const found = await this.aboutRepository.findOneBy({
       tabKey: dto.tabKey,
@@ -38,12 +50,7 @@ export class AboutService {
 
     const saved = await this.aboutRepository.save(created);
 
-    return {
-      id: saved.id,
-      tabKey: saved.tabKey,
-      menuKey: saved.menuKey,
-      content: saved.content_ko,
-    };
+    return this.toResponseDto(saved);
   }
 
   async findByKeys(
@@ -65,12 +72,7 @@ export class AboutService {
       );
     }
 
-    return {
-      id: found.id,
-      tabKey: found.tabKey,
-      menuKey: found.menuKey,
-      content: lang === LangType.Korean ? found.content_ko : found.content_en,
-    };
+    return this.toResponseDto(found, lang);
   }
 
   async update(
@@ -114,8 +116,6 @@ export class AboutService {
 
     const updated = await this.aboutRepository.save(toUpdate);
 
-    return {
-      ...updated,
-    };
+    return this.toResponseDto(updated);
   }
 }
