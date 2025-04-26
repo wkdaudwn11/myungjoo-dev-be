@@ -7,6 +7,7 @@ import { ProjectResponseDto } from './dto/project-response.dto';
 import { Project } from './entities/project.entity';
 
 import { ErrorCode } from '@/common/constants/error-code.enum';
+import { LangType } from '@/common/constants/lang-type.enum';
 import { CustomException } from '@/common/exceptions/custom.exception';
 import { getNextOrder } from '@/common/utils/order.util';
 
@@ -17,7 +18,28 @@ export class ProjectService {
     private readonly projectRepository: Repository<Project>,
   ) {}
 
-  private toResponseDto(entity: Project): ProjectResponseDto {
+  private toResponseDto(entity: Project): ProjectResponseDto;
+  private toResponseDto(entity: Project[]): ProjectResponseDto[];
+  private toResponseDto(
+    entity: Project | Project[],
+  ): ProjectResponseDto | ProjectResponseDto[] {
+    if (Array.isArray(entity)) {
+      return entity.map((item) => ({
+        id: item.id,
+        key: item.key,
+        lang: item.lang,
+        title: item.title,
+        language: item.language,
+        tech_stack: item.tech_stack,
+        thumbnail_url: item.thumbnail_url,
+        description: item.description,
+        github_url: item.github_url,
+        site_url: item.site_url,
+        displayOrder: item.displayOrder,
+        startDate: item.startDate,
+        endDate: item.endDate,
+      }));
+    }
     return {
       id: entity.id,
       key: entity.key,
@@ -66,6 +88,62 @@ export class ProjectService {
       displayOrder,
     });
     const saved = await this.projectRepository.save(entity);
+    return this.toResponseDto(saved);
+  }
+
+  async findByLang(lang: string): Promise<ProjectResponseDto[]> {
+    const langEnum = lang as LangType;
+    const found = await this.projectRepository.find({
+      where: { lang: langEnum },
+    });
+    if (!found) {
+      throw new CustomException(
+        `'${lang}' does not exist.`,
+        ErrorCode.NOTFOUND_ERROR,
+        {
+          fieldErrors: [
+            {
+              field: 'lang',
+              message: `lang '${lang}' does not exist.`,
+            },
+          ],
+        },
+        404,
+      );
+    }
+    return this.toResponseDto(found);
+  }
+
+  async updateByKeyAndLang(
+    key: string,
+    lang: string,
+    dto: Partial<Project>,
+  ): Promise<ProjectResponseDto> {
+    const langEnum = lang as LangType;
+    const found = await this.projectRepository.findOne({
+      where: { key, lang: langEnum },
+    });
+    if (!found) {
+      throw new CustomException(
+        `Project with key '${key}' and lang '${lang}' does not exist.`,
+        ErrorCode.NOTFOUND_ERROR,
+        {
+          fieldErrors: [
+            {
+              field: 'key',
+              message: `Project with key '${key}' and lang '${lang}' does not exist.`,
+            },
+            {
+              field: 'lang',
+              message: `Project with key '${key}' and lang '${lang}' does not exist.`,
+            },
+          ],
+        },
+        404,
+      );
+    }
+    const merged = this.projectRepository.merge(found, dto);
+    const saved = await this.projectRepository.save(merged);
     return this.toResponseDto(saved);
   }
 }
