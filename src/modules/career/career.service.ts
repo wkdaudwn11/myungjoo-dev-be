@@ -17,8 +17,6 @@ export class CareerService {
   constructor(
     @InjectRepository(Career)
     private readonly careerRepository: Repository<Career>,
-    @InjectRepository(CareerProject)
-    private readonly careerProjectRepository: Repository<CareerProject>,
     private readonly dataSource: DataSource,
   ) {}
 
