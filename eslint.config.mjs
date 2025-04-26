@@ -62,7 +62,7 @@ export default tseslint.config(
       'import/newline-after-import': 'warn',
 
       '@typescript-eslint/no-unused-vars': [
-        'warn',
+        'error',
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
 
