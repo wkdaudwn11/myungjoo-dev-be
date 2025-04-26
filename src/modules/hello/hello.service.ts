@@ -17,6 +17,16 @@ export class HelloService {
     private readonly helloRepository: Repository<Hello>,
   ) {}
 
+  private toResponseDto(entity: Hello): HelloResponseDto {
+    return {
+      lang: entity.lang,
+      text01: entity.text01,
+      name: entity.name,
+      text02: entity.text02,
+      code: entity.code,
+    };
+  }
+
   async create(dto: CreateHelloDto): Promise<HelloResponseDto> {
     const found = await this.helloRepository.findOneBy({ lang: dto.lang });
 
@@ -28,7 +38,7 @@ export class HelloService {
     }
 
     const saved = await this.helloRepository.save(dto);
-    return saved;
+    return this.toResponseDto(saved);
   }
 
   async findByLang(lang: LangType): Promise<HelloResponseDto> {
@@ -50,7 +60,7 @@ export class HelloService {
       );
     }
 
-    return found;
+    return this.toResponseDto(found);
   }
 
   async updateByLang(
@@ -94,6 +104,6 @@ export class HelloService {
     const updated = this.helloRepository.merge(found, dto);
     const saved = await this.helloRepository.save(updated);
 
-    return saved;
+    return this.toResponseDto(saved);
   }
 }

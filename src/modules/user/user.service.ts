@@ -8,6 +8,12 @@ import { User } from './entities/user.entity';
 import { ErrorCode } from '@/common/constants/error-code.enum';
 import { CustomException } from '@/common/exceptions/custom.exception';
 
+export interface UserResponseDto {
+  id: number;
+  email: string;
+  name: string;
+}
+
 @Injectable()
 export class UserService {
   constructor(
@@ -15,7 +21,15 @@ export class UserService {
     private readonly userRepo: Repository<User>,
   ) {}
 
-  async create(dto: CreateUserDto): Promise<User> {
+  private toResponseDto(entity: User): UserResponseDto {
+    return {
+      id: entity.id,
+      email: entity.email,
+      name: entity.name,
+    };
+  }
+
+  async create(dto: CreateUserDto): Promise<UserResponseDto> {
     const existing = await this.userRepo.findOne({
       where: { email: dto.email },
     });
@@ -36,6 +50,7 @@ export class UserService {
     }
 
     const user = this.userRepo.create(dto);
-    return this.userRepo.save(user);
+    const saved = await this.userRepo.save(user);
+    return this.toResponseDto(saved);
   }
 }
