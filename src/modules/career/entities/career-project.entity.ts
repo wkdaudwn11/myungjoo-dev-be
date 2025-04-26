@@ -14,7 +14,7 @@ export class CareerProject {
   description: string;
 
   @ManyToOne(() => Career, (career) => career.projects, { onDelete: 'CASCADE' })
-  career: Career | null;
+  career: Career;
 
   @Column()
   careerId: string;
