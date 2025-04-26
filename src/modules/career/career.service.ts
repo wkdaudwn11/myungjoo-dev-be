@@ -34,7 +34,18 @@ export class CareerService {
       throw new CustomException(
         `'${createCareerDto.key}/${createCareerDto.lang}' key already exists.`,
         ErrorCode.DUPLICATE_ERROR,
-        { key: createCareerDto.key, lang: createCareerDto.lang },
+        {
+          fieldErrors: [
+            {
+              field: 'key',
+              message: `'${createCareerDto.key}/${createCareerDto.lang}' key already exists.`,
+            },
+            {
+              field: 'lang',
+              message: `'${createCareerDto.key}/${createCareerDto.lang}' key already exists.`,
+            },
+          ],
+        },
       );
     }
 
