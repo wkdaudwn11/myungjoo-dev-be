@@ -50,8 +50,8 @@ describe('CareerController', () => {
               }
               return Promise.resolve(mockCareerResponse);
             }),
-            findOneByLang: jest.fn().mockResolvedValue(mockCareerResponse),
             updateByKeyAndLang: jest.fn().mockResolvedValue(mockCareerResponse),
+            findByLang: jest.fn().mockResolvedValue([mockCareerResponse]),
           },
         },
       ],
@@ -101,12 +101,6 @@ describe('CareerController', () => {
     expect(service.create).toHaveBeenCalledWith(dto);
   });
 
-  it('경력 단일 조회 성공', async () => {
-    const result = await controller.findOneByLang('ko' as LangType);
-    expect(result).toEqual(mockCareerResponse);
-    expect(service.findOneByLang).toHaveBeenCalledWith('ko');
-  });
-
   it('경력 수정 성공', async () => {
     const dto: UpdateCareerDto = {
       name: '수정된 이름',
@@ -151,5 +145,12 @@ describe('CareerController', () => {
       'ko',
       dto,
     );
+  });
+
+  it('경력 조회 성공', async () => {
+    (service.findByLang as jest.Mock).mockResolvedValue([mockCareerResponse]);
+    const result = await controller.findByLang('ko' as LangType);
+    expect(result).toEqual([mockCareerResponse]);
+    expect(service.findByLang).toHaveBeenCalledWith('ko');
   });
 });

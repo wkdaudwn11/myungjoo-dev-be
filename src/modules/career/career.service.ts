@@ -26,6 +26,33 @@ export class CareerService {
     private readonly dataSource: DataSource,
   ) {}
 
+  private toResponseDto(entity: Career): CareerResponseDto;
+  private toResponseDto(entity: Career[]): CareerResponseDto[];
+  private toResponseDto(
+    entity: Career | Career[],
+  ): CareerResponseDto | CareerResponseDto[] {
+    if (Array.isArray(entity)) {
+      return entity.map((item) => this.toResponseDto(item));
+    }
+    return {
+      id: entity.id,
+      key: entity.key,
+      lang: entity.lang,
+      name: entity.name,
+      slogan: entity.slogan,
+      role: entity.role,
+      logoUrl: entity.logoUrl,
+      startDate: entity.startDate,
+      endDate: entity.endDate,
+      projects:
+        entity.projects?.map((p) => ({
+          id: p.id,
+          title: p.title,
+          description: p.description,
+        })) || [],
+    };
+  }
+
   async create(createCareerDto: CreateCareerDto): Promise<CareerResponseDto> {
     const exists = await this.careerRepository.findOne({
       where: { key: createCareerDto.key, lang: createCareerDto.lang },
@@ -68,23 +95,23 @@ export class CareerService {
       } else {
         savedCareer.projects = [];
       }
-      return savedCareer;
+      return this.toResponseDto(savedCareer);
     });
   }
 
-  async findOneByLang(lang: LangType): Promise<CareerResponseDto> {
-    const found = await this.careerRepository.findOne({
+  async findByLang(lang: LangType): Promise<CareerResponseDto[]> {
+    const found = await this.careerRepository.find({
       where: { lang },
       relations: ['projects'],
     });
-    if (!found) {
+    if (!found || found.length === 0) {
       throw new CustomException(
         `lang '${lang}' does not exist.`,
         ErrorCode.NOTFOUND_ERROR,
         { lang },
       );
     }
-    return found;
+    return this.toResponseDto(found);
   }
 
   async updateByKeyAndLang(
@@ -122,7 +149,7 @@ export class CareerService {
         await manager.save(CareerProject, projectEntities);
         updatedCareer.projects = projectEntities;
       }
-      return updatedCareer;
+      return this.toResponseDto(updatedCareer);
     });
   }
 }
