@@ -44,18 +44,19 @@ export class CareerController {
   @Get()
   @ApiOperation({
     summary: '경력 조회',
-    description: '언어별 경력 조회',
+    description: '언어별 경력을 조회합니다.',
   })
   @ApiResponse({
     status: 200,
     description: '경력 조회 성공',
     type: CareerResponseDto,
+    isArray: true,
   })
   @ApiResponse({ status: 404, description: '경력이 존재하지 않음' })
-  async findOneByLang(
+  async findByLang(
     @Query('lang') lang: LangType,
-  ): Promise<CareerResponseDto> {
-    return this.careerService.findOneByLang(lang);
+  ): Promise<CareerResponseDto[]> {
+    return this.careerService.findByLang(lang);
   }
 
   @Put(':key/:lang')
