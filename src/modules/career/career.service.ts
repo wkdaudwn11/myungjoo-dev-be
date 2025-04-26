@@ -2,11 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
 
+import { CareerResponseDto } from './dto/career-response.dto';
 import {
   CreateCareerDto,
   CreateCareerProjectDto,
 } from './dto/create-career.dto';
-import { UpdateCareerDto } from './dto/update-career.dto';
+import {
+  UpdateCareerDto,
+  UpdateCareerProjectDto,
+} from './dto/update-career.dto';
 import { CareerProject } from './entities/career-project.entity';
 import { Career } from './entities/career.entity';
 
@@ -22,7 +26,7 @@ export class CareerService {
     private readonly dataSource: DataSource,
   ) {}
 
-  async create(createCareerDto: CreateCareerDto): Promise<Career> {
+  async create(createCareerDto: CreateCareerDto): Promise<CareerResponseDto> {
     const exists = await this.careerRepository.findOne({
       where: { key: createCareerDto.key, lang: createCareerDto.lang },
     });
@@ -57,7 +61,7 @@ export class CareerService {
     });
   }
 
-  async findOneByLang(lang: LangType): Promise<Career> {
+  async findOneByLang(lang: LangType): Promise<CareerResponseDto> {
     const found = await this.careerRepository.findOne({
       where: { lang },
       relations: ['projects'],
@@ -76,7 +80,7 @@ export class CareerService {
     key: string,
     lang: LangType,
     dto: UpdateCareerDto,
-  ): Promise<Career> {
+  ): Promise<CareerResponseDto> {
     const found = await this.careerRepository.findOne({
       where: { key, lang },
       relations: ['projects'],
@@ -97,7 +101,7 @@ export class CareerService {
       if (projects) {
         await manager.delete(CareerProject, { careerId: found.id });
         const projectEntities = projects.map(
-          (project: CreateCareerProjectDto) =>
+          (project: UpdateCareerProjectDto) =>
             manager.create(CareerProject, {
               ...project,
               career: updatedCareer,
