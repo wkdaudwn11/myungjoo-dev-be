@@ -2,9 +2,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-
 import { DbModule } from '@/db/db.module';
 import { AboutModule } from '@/modules/about/about.module';
 import { AboutCategoryModule } from '@/modules/about/category/about-category.module';
@@ -12,7 +9,6 @@ import { CareerModule } from '@/modules/career/career.module';
 import { HealthModule } from '@/modules/health/health.module';
 import { HelloModule } from '@/modules/hello/hello.module';
 import { ProjectModule } from '@/modules/project/project.module';
-import { UserModule } from '@/modules/user/user.module';
 
 @Module({
   imports: [
@@ -46,9 +42,8 @@ import { UserModule } from '@/modules/user/user.module';
     HealthModule,
     HelloModule,
     ProjectModule,
-    UserModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
