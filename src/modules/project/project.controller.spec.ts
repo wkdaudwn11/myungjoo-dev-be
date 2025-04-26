@@ -42,6 +42,8 @@ describe('ProjectController', () => {
               }
               return Promise.resolve(mockProjectResponse);
             }),
+            findByLang: jest.fn(),
+            updateByKeyAndLang: jest.fn(),
           },
         },
       ],
@@ -87,5 +89,30 @@ describe('ProjectController', () => {
     } as Partial<CreateProjectDto>;
     await expect(controller.create(dto as CreateProjectDto)).rejects.toThrow();
     expect(service.create).toHaveBeenCalledWith(dto as CreateProjectDto);
+  });
+
+  it('프로젝트 조회 성공', async () => {
+    jest.spyOn(service, 'findByLang').mockResolvedValue([mockProjectResponse]);
+    const result = await controller.findByLang(LangType.Korean);
+    expect(result).toEqual([mockProjectResponse]);
+    expect(service.findByLang).toHaveBeenCalledWith(LangType.Korean);
+  });
+
+  it('프로젝트 수정 성공', async () => {
+    jest
+      .spyOn(service, 'updateByKeyAndLang')
+      .mockResolvedValue(mockProjectResponse);
+    const dto = { title: '수정된 제목' };
+    const result = await controller.updateByKeyAndLang(
+      'myungjoo.dev',
+      LangType.Korean,
+      dto,
+    );
+    expect(result).toEqual(mockProjectResponse);
+    expect(service.updateByKeyAndLang).toHaveBeenCalledWith(
+      'myungjoo.dev',
+      LangType.Korean,
+      dto,
+    );
   });
 });
