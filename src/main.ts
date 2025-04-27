@@ -12,13 +12,24 @@ import { ResponseInterceptor } from '@/interceptors/response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
   const config = app.get(ConfigService);
 
+  const allowedOrigins =
+    config.get<string>('ALLOWED_ORIGINS')?.split(',') ?? [];
+
   app.use(helmet());
+
   app.enableCors({
-    origin:
-      config.get('NODE_ENV') === 'production' ? 'https://myungjoo.dev' : '*',
+    origin(
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
   });
 
   app.useGlobalInterceptors(new ResponseInterceptor());

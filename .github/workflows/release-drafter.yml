@@ -1,9 +1,10 @@
 name: Release Drafter
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: ['Deploy Pipeline']
+    types:
+      - completed
 
 jobs:
   update_release_draft:

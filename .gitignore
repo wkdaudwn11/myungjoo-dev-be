@@ -54,3 +54,7 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 .cursor/*
 .cursorrules
+
+sync/*
+nginx/*
+project_setup_summary.txt
