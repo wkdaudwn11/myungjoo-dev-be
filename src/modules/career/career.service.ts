@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, In } from 'typeorm';
 
 import { CareerResponseDto } from './dto/career-response.dto';
 import {
@@ -99,10 +99,14 @@ export class CareerService {
     });
   }
 
-  async findByLang(lang: LangType): Promise<CareerResponseDto[]> {
+  async findByLang(
+    lang: LangType,
+    key: string[],
+  ): Promise<CareerResponseDto[]> {
     const found = await this.careerRepository.find({
-      where: { lang },
+      where: { lang, key: key && key.length > 0 ? In(key) : undefined },
       relations: ['projects'],
+      order: { startDate: 'DESC' },
     });
     if (!found || found.length === 0) {
       throw new CustomException(

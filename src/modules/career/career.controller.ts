@@ -9,7 +9,13 @@ import {
   Query,
   Param,
 } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiParam,
+  ApiQuery,
+} from '@nestjs/swagger';
 
 import { CareerService } from './career.service';
 import { CareerResponseDto } from './dto/career-response.dto';
@@ -46,6 +52,20 @@ export class CareerController {
     summary: '경력 조회',
     description: '언어별 경력을 조회합니다.',
   })
+  @ApiQuery({
+    name: 'lang',
+    required: true,
+    type: String,
+    description: '조회할 언어(ko, en)',
+  })
+  @ApiQuery({
+    name: 'key',
+    required: false,
+    type: String,
+    isArray: true,
+    description: '조회할 career key(복수 가능)',
+    example: ['supertree', 'ddive'],
+  })
   @ApiResponse({
     status: 200,
     description: '경력 조회 성공',
@@ -55,8 +75,11 @@ export class CareerController {
   @ApiResponse({ status: 404, description: '경력이 존재하지 않음' })
   async findByLang(
     @Query('lang') lang: LangType,
+    @Query('key') key: string | string[],
   ): Promise<CareerResponseDto[]> {
-    return this.careerService.findByLang(lang);
+    const keyArr: string[] | undefined =
+      typeof key === 'string' ? key.split(',') : key;
+    return this.careerService.findByLang(lang, keyArr);
   }
 
   @Put(':key/:lang')
