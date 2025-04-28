@@ -149,8 +149,8 @@ describe('CareerController', () => {
 
   it('경력 조회 성공', async () => {
     (service.findByLang as jest.Mock).mockResolvedValue([mockCareerResponse]);
-    const result = await controller.findByLang('ko' as LangType);
+    const result = await controller.findByLang('ko' as LangType, 'supertree');
     expect(result).toEqual([mockCareerResponse]);
-    expect(service.findByLang).toHaveBeenCalledWith('ko');
+    expect(service.findByLang).toHaveBeenCalledWith('ko', ['supertree']);
   });
 });
