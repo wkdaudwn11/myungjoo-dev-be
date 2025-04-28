@@ -104,7 +104,7 @@ export class CareerService {
     key: string[],
   ): Promise<CareerResponseDto[]> {
     const found = await this.careerRepository.find({
-      where: { lang, key: key ? In(key) : undefined },
+      where: { lang, key: key && key.length > 0 ? In(key) : undefined },
       relations: ['projects'],
       order: { startDate: 'DESC' },
     });
