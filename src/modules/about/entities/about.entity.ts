@@ -11,9 +11,9 @@ export class About {
   @Column({ type: 'varchar', length: 100 })
   menuKey: string;
 
-  @Column({ type: 'varchar', length: 500 })
+  @Column({ type: 'varchar', length: 1000 })
   content_ko: string;
 
-  @Column({ type: 'varchar', length: 500 })
+  @Column({ type: 'varchar', length: 1000 })
   content_en: string;
 }

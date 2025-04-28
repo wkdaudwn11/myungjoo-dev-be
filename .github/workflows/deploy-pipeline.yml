@@ -50,7 +50,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i /tmp/my_key.pem ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} << 'EOF'
             cd ~/apps/myungjoo-dev-be
-            git pull origin chore/deploy
+            git pull origin main
             docker compose down
             docker compose build
             docker compose up -d
