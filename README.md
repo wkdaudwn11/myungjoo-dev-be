@@ -35,7 +35,7 @@
 
 ## 🔗 프론트엔드 레포 바로가기
 
-👉 [https://github.com/wkdaudwn11/myungjoo-dev](https://github.com/wkdaudwn11/myungjoo-dev)
+👉 [https://github.com/myungjuice/myungjoo-dev](https://github.com/myungjuice/myungjoo-dev)
 
 ## 🧰 사용 기술 스택
 
