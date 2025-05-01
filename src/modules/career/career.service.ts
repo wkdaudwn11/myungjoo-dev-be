@@ -38,7 +38,10 @@ export class CareerService {
       id: entity.id,
       key: entity.key,
       lang: entity.lang,
-      name: entity.name,
+      name: {
+        ko: entity.lang === LangType.Korean ? entity.name : '',
+        en: entity.lang === LangType.English ? entity.name : '',
+      },
       slogan: entity.slogan,
       role: entity.role,
       logoUrl: entity.logoUrl,
@@ -107,16 +110,23 @@ export class CareerService {
       return [];
     }
 
-    const found = await this.careerRepository.find({
-      where: {
-        lang,
-        ...(key.length > 0 && !key.includes('all') ? { key: In(key) } : {}),
-      },
-      relations: ['projects'],
-      order: { startDate: 'DESC' },
-    });
+    const isAll = key.includes('all');
+    const keyFilter = isAll ? {} : { key: In(key) };
 
-    if (!found || found.length === 0) {
+    const [targetLangCareers, allLangCareers] = await Promise.all([
+      this.careerRepository.find({
+        where: { lang, ...keyFilter },
+        relations: ['projects'],
+        order: { startDate: 'DESC' },
+      }),
+      this.careerRepository.find({
+        where: keyFilter,
+        relations: ['projects'],
+        order: { startDate: 'DESC' },
+      }),
+    ]);
+
+    if (!targetLangCareers.length) {
       throw new CustomException(
         `No data found for lang '${lang}'.`,
         ErrorCode.NOTFOUND_ERROR,
@@ -124,7 +134,19 @@ export class CareerService {
       );
     }
 
-    return this.toResponseDto(found);
+    const namesByKey: Record<string, { ko: string; en: string }> = {};
+
+    for (const item of allLangCareers) {
+      const { key, lang, name } = item;
+      if (!namesByKey[key]) namesByKey[key] = { ko: '', en: '' };
+
+      namesByKey[key][lang] = name;
+    }
+
+    return targetLangCareers.map((item) => ({
+      ...this.toResponseDto(item),
+      name: namesByKey[item.key],
+    }));
   }
 
   async updateByKeyAndLang(

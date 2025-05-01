@@ -34,8 +34,14 @@ export class CareerResponseDto {
   })
   lang: LangType;
 
-  @ApiProperty({ example: '㈜ 수퍼트리', description: '회사/경력 이름' })
-  name: string;
+  @ApiProperty({
+    example: { ko: '㈜ 수퍼트리', en: 'Supertree Corp.' },
+    description: '회사/경력 이름',
+  })
+  name: {
+    ko: string;
+    en: string;
+  };
 
   @ApiProperty({
     example:
