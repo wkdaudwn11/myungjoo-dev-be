@@ -101,20 +101,29 @@ export class CareerService {
 
   async findByLang(
     lang: LangType,
-    key: string[],
+    key: string[] = [],
   ): Promise<CareerResponseDto[]> {
+    if (key.length === 0) {
+      return [];
+    }
+
     const found = await this.careerRepository.find({
-      where: { lang, key: key && key.length > 0 ? In(key) : undefined },
+      where: {
+        lang,
+        ...(key.length > 0 && !key.includes('all') ? { key: In(key) } : {}),
+      },
       relations: ['projects'],
       order: { startDate: 'DESC' },
     });
+
     if (!found || found.length === 0) {
       throw new CustomException(
-        `lang '${lang}' does not exist.`,
+        `No data found for lang '${lang}'.`,
         ErrorCode.NOTFOUND_ERROR,
         { lang },
       );
     }
+
     return this.toResponseDto(found);
   }
 
