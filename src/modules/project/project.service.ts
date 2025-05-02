@@ -10,6 +10,7 @@ import { ErrorCode } from '@/common/constants/error-code.enum';
 import { LangType } from '@/common/constants/lang-type.enum';
 import { CustomException } from '@/common/exceptions/custom.exception';
 import { getNextOrder } from '@/common/utils/order.util';
+import { validateLang } from '@/common/utils/validation.util';
 
 @Injectable()
 export class ProjectService {
@@ -91,26 +92,32 @@ export class ProjectService {
     return this.toResponseDto(saved);
   }
 
-  async findByLang(lang: string): Promise<ProjectResponseDto[]> {
-    const langEnum = lang as LangType;
-    const found = await this.projectRepository.find({
-      where: { lang: langEnum },
-    });
-    if (!found) {
-      throw new CustomException(
-        `'${lang}' does not exist.`,
-        ErrorCode.NOTFOUND_ERROR,
-        {
-          fieldErrors: [
-            {
-              field: 'lang',
-              message: `lang '${lang}' does not exist.`,
-            },
-          ],
-        },
-        404,
-      );
+  async findByLangAndTechStack(
+    lang: LangType,
+    tech: string[],
+  ): Promise<ProjectResponseDto[]> {
+    validateLang(lang);
+
+    if (!tech || tech.length === 0) return [];
+
+    if (tech.length === 1 && tech[0] === 'all') {
+      const found = await this.projectRepository.find({
+        where: { lang },
+      });
+      return this.toResponseDto(found);
     }
+
+    const query = this.projectRepository
+      .createQueryBuilder('project')
+      .where('project.lang = :lang', { lang });
+
+    tech.forEach((t, index) => {
+      query.andWhere(`project.tech_stack LIKE :tech${index}`, {
+        [`tech${index}`]: `%${t}%`,
+      });
+    });
+
+    const found = await query.getMany();
     return this.toResponseDto(found);
   }
 

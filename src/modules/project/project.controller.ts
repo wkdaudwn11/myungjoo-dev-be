@@ -51,10 +51,13 @@ export class ProjectController {
     type: ProjectResponseDto,
   })
   @ApiResponse({ status: 404, description: '프로젝트를 찾을 수 없음' })
-  async findByLang(
+  async findByLangAndTechStack(
     @Query('lang') lang: LangType,
+    @Query('tech') tech: string | string[],
   ): Promise<ProjectResponseDto[]> {
-    return this.projectService.findByLang(lang);
+    const techArr: string[] | undefined =
+      typeof tech === 'string' ? tech.split(',') : tech;
+    return this.projectService.findByLangAndTechStack(lang, techArr);
   }
 
   @Put(':key/:lang')

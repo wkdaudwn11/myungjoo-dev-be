@@ -16,7 +16,10 @@ const mockCareerResponse: CareerResponseDto = {
   id: 'uuid-career',
   key: 'supertree',
   lang: 'ko' as LangType,
-  name: '㈜ 수퍼트리',
+  name: {
+    ko: '㈜ 수퍼트리',
+    en: 'Supertree Corp.',
+  },
   slogan:
     'PlayDapp 생태계 내에서 블록체인 기반 프론트엔드 플랫폼(마켓, 포털, 미니앱 등) 개발',
   role: 'Frontend Developer (React, Next.js)',

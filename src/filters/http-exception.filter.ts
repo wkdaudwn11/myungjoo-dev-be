@@ -33,7 +33,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     const request = ctx.getRequest<Request>();
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = '서버 내부 오류가 발생했습니다.';
+    let message = 'An internal server error has occurred.';
     let code: string | undefined;
     let meta: Record<string, unknown> = {};
 

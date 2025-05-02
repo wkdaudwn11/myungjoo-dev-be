@@ -9,6 +9,7 @@ import { Hello } from './entities/hello.entity';
 import { ErrorCode } from '@/common/constants/error-code.enum';
 import { LangType } from '@/common/constants/lang-type.enum';
 import { CustomException } from '@/common/exceptions/custom.exception';
+import { validateLang } from '@/common/utils/validation.util';
 
 @Injectable()
 export class HelloService {
@@ -42,6 +43,8 @@ export class HelloService {
   }
 
   async findByLang(lang: LangType): Promise<HelloResponseDto> {
+    validateLang(lang);
+
     const found = await this.helloRepository.findOneBy({ lang });
 
     if (!found) {
