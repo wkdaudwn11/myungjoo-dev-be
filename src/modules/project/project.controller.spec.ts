@@ -42,7 +42,7 @@ describe('ProjectController', () => {
               }
               return Promise.resolve(mockProjectResponse);
             }),
-            findByLang: jest.fn(),
+            findByLangAndTechStack: jest.fn(),
             updateByKeyAndLang: jest.fn(),
           },
         },
@@ -92,10 +92,18 @@ describe('ProjectController', () => {
   });
 
   it('프로젝트 조회 성공', async () => {
-    jest.spyOn(service, 'findByLang').mockResolvedValue([mockProjectResponse]);
-    const result = await controller.findByLang(LangType.Korean);
+    jest
+      .spyOn(service, 'findByLangAndTechStack')
+      .mockResolvedValue([mockProjectResponse]);
+    const result = await controller.findByLangAndTechStack(LangType.Korean, [
+      'react',
+      'typescript',
+    ]);
     expect(result).toEqual([mockProjectResponse]);
-    expect(service.findByLang).toHaveBeenCalledWith(LangType.Korean);
+    expect(service.findByLangAndTechStack).toHaveBeenCalledWith(
+      LangType.Korean,
+      ['react', 'typescript'],
+    );
   });
 
   it('프로젝트 수정 성공', async () => {

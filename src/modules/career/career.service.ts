@@ -17,6 +17,7 @@ import { Career } from './entities/career.entity';
 import { ErrorCode } from '@/common/constants/error-code.enum';
 import { LangType } from '@/common/constants/lang-type.enum';
 import { CustomException } from '@/common/exceptions/custom.exception';
+import { validateLang } from '@/common/utils/validation.util';
 
 @Injectable()
 export class CareerService {
@@ -106,7 +107,9 @@ export class CareerService {
     lang: LangType,
     key: string[] = [],
   ): Promise<CareerResponseDto[]> {
-    if (key.length === 0) {
+    validateLang(lang);
+
+    if (!key || key.length === 0) {
       return [];
     }
 
